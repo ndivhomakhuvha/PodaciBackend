@@ -31,6 +31,6 @@ pool.query("SELECT NOW()", (err, res) => {
   } else {
     console.log("Successfully connected to the database");
   }
-  
+
 });
 app.use('/api/user', routes)
