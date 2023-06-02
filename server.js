@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import "dotenv/config";
 import pool from "./config/database_configuration.js";
+import routes from './routes/user_router.js'
 
 
 const app = express();
@@ -30,5 +31,6 @@ pool.query("SELECT NOW()", (err, res) => {
   } else {
     console.log("Successfully connected to the database");
   }
-  pool.end();
+  
 });
+app.use('/api/user', routes)
