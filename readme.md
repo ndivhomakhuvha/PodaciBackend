@@ -19,6 +19,12 @@
 | Retrieving Servers By ID |  GET   |        /api/server/:id |
 | Retrieving All Servers   |  GET   |            /api/server |
 | Update One Server        |  PUT   | /api/server/update/:id |
+| Delete One Server        | DELETE |        /api/server/:id |
+## GPT ROUTE
+| Description     | Method |      URL |
+| --------------- | :----: | -------: |
+| POST A QUESTION |  POST  | /api/gpt |
+
 
 # Adding a table with References 
 
