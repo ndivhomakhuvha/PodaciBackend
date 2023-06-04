@@ -5,7 +5,7 @@ import "dotenv/config";
 import pool from "./config/database_configuration.js";
 import Userroutes from './routes/user_router.js'
 import Serverroutes from './routes/server_router.js'
-
+import GPTRoutes from './routes/gpt_router.js'
 
 
 
@@ -38,3 +38,4 @@ pool.query("SELECT NOW()", (err, res) => {
 });
 app.use('/api/user', Userroutes)
 app.use('/api/server', Serverroutes);
+app.use('/api/gpt', GPTRoutes);

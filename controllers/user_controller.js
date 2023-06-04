@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import client from "../config/database_configuration.js";
 import transporter from "../config/email_configuration.js";
+import 'dotenv/config.js'
 
 
 async function EmailExists(email) {
@@ -72,12 +73,12 @@ const Signin = (request, response) => {
       if (isPasswordValid) {
 
         const mailConfigurations = {
-          from: "ndibo69@gmail.com",
+          from: process.env.NODEMAILER_USER,
           to: email,
           subject: "Sign in OTP",
           // This would be the text of email body
           html:
-            "<h1>Your OTP(One-time-pin) is : </h1><br/>" +
+            "<h1>Your Sign in OTP:</h1><br/>" +
             email +
             `<p>Your OTP is: <strong>${number}</strong><br/><br/>
                          Made with ❤️ By FlexBox Inc.</p>`,

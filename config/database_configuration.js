@@ -2,9 +2,9 @@ import "dotenv/config";
 import Pool from 'pg'
 const PoolConstructor = Pool.Pool;
 const pool = new PoolConstructor({
-  user: "postgres",
-  host: "localhost",
-  database: "PersonalProjectDB",
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DATABASE,
   password: process.env.POSTGRES_PASS,
   port: process.env.PORT_DB,
 });

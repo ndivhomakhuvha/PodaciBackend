@@ -1,7 +1,7 @@
 
 import axios from 'axios'
-import { request, response } from 'express';
 import client from '../config/database_configuration.js'
+import { response } from 'express';
 
 
 async function checkUrl(url) {
@@ -18,10 +18,7 @@ async function checkUrl(url) {
     }
     return status;
 }
-checkUrl('http://127.0.0.1:3500').then(data => {
 
-    console.log(data)
-})
 
 
 
@@ -131,4 +128,20 @@ const updateServer = (request, response) => {
 
 }
 
-export default { createServer, viewServersById, getAllServers, updateServer }
+const DeleteOne = async (request, response) => {
+    const { server_id } = parseInt(request.params.server_id);
+    try {
+        await client.query('DELETE FROM addresses WHERE server_id = $1', [server_id], (error, results) => {
+            if (error) {
+                throw error;
+            }
+            return response.status(200).send({ message: `Server with ID ${server_id} Has Been Deleted!` })
+        })
+    } catch (error) {
+        console.error('Error saving user to the database:', error);
+        throw error;
+    }
+
+}
+
+export default { createServer, viewServersById, getAllServers, updateServer, DeleteOne }
