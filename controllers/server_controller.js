@@ -1,11 +1,27 @@
 
-
-import { request } from 'express';
+import axios from 'axios'
+import { request, response } from 'express';
 import client from '../config/database_configuration.js'
 
 
+async function checkUrl(url) {
+    let status;
+    try {
+        const response = await axios.get(url);
+        if (response.status === 200) {
+            status = 'SERVER UP'
+        } else {
+            status = 'SERVER DOWN'
+        }
+    } catch (error) {
+        status = 'SERVER DOWN'
+    }
+    return status;
+}
+checkUrl('http://127.0.0.1:3500').then(data => {
 
-
+    console.log(data)
+})
 
 
 
@@ -27,10 +43,16 @@ async function ServerExists(ipadress) {
 
 }
 
+
 const createServer = async (request, response) => {
-    const { imageurl, ipadress, name, memory, type, status, user_id } = request.body;
+    let status;
+    const { imageurl, ipadress, name, memory, type, user_id } = request.body;
 
-
+    checkUrl(`http://${ipadress}`).then(data => {
+        status = data;
+    }).catch((error) => {
+        status = error;
+    })
 
     try {
         const exists = await ServerExists(ipadress);
@@ -71,4 +93,42 @@ const viewServersById = async (request, response) => {
     }
 }
 
-export default { createServer, viewServersById }
+const getAllServers = async (request, response) => {
+    try {
+        await client.query('SELECT * FROM addresses ORDER BY server_id ASC', (error, results) => {
+            if (error) {
+                throw error;
+            }
+            return response.status(200).send(results.rows)
+        })
+    } catch (error) {
+        console.error('Error saving user to the database:', error);
+        throw error;
+    }
+}
+
+const updateServer = (request, response) => {
+    let status;
+    const server_id = parseInt(request.params.id)
+    const { ipadress } = request.body
+
+    checkUrl(`http://${ipadress}`).then(status => {
+        client.query(
+            'UPDATE addresses SET ipadress = $1 , status = $2 WHERE server_id = $3',
+            [ipadress, status, server_id],
+            (error, results) => {
+                if (error) {
+                    throw error
+                }
+                response.status(200).send(`User modified with ID: ${server_id}`)
+            }
+        )
+
+    }).catch((error) => {
+        status = error;
+    })
+
+
+}
+
+export default { createServer, viewServersById, getAllServers, updateServer }

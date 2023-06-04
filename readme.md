@@ -11,6 +11,14 @@
 | Register    |  POST  |      /api/user |
 | Login       |  POST  | /api/user/sign |
 
+## SERVER
+
+| Description              | Method |                    URL |
+| ------------------------ | :----: | ---------------------: |
+| Add Server               |  POST  |            /api/server |
+| Retrieving Servers By ID |  GET   |        /api/server/:id |
+| Retrieving All Servers   |  GET   |            /api/server |
+| Update One Server        |  PUT   | /api/server/update/:id |
 
 # Adding a table with References 
 

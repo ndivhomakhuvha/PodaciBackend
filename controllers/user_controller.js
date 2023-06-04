@@ -87,7 +87,13 @@ const Signin = (request, response) => {
           if (error) throw Error(error);
           console.log(info)
         });
-        response.status(200).send(results.rows[0])
+        let successObject = {
+          email: email,
+          username: results.rows[0].username,
+          number: number
+        }
+
+        response.status(200).send(successObject)
       }
       else {
         response.status(409).send({ message: 'Failure response' })
