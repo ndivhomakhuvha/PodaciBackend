@@ -110,7 +110,7 @@ const resendOTP = async (request, response) => {
       html:
         "<h1>Your Sign in OTP:</h1><br/>" +
         email +
-        `<p>Your OTP is: <strong>${number}</strong><br/><br/>
+        `<p>Your Request for An OTP Resend is: <strong>${number}</strong><br/><br/>
                        Made with ❤️ By FlexBox Inc.</p>`,
     };
     // Send the mail upon everything above correct
