@@ -33,8 +33,7 @@ const createUser = async (request, response) => {
   try {
     const exists = await EmailExists(email);
     if (exists) {
-      response.status(409).send({ message: 'User already exists' })
-      return;
+     return response.status(409).send({ message: 'User already exists' })
     }
     await client.query(
       "INSERT INTO users (username, email,password) VALUES ($1, $2, $3) RETURNING *",
@@ -43,7 +42,7 @@ const createUser = async (request, response) => {
         if (error) {
           throw error;
         }
-        response.status(201).send(`User added with ID: ${results.rows[0].id}`);
+        return response.status(201).json(results.rows);
       }
     )
   } catch (error) {
