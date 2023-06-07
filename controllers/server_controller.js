@@ -82,7 +82,7 @@ const viewServersById = async (request, response) => {
             if (error) {
                 throw error;
             }
-            return response.status(200).send(results.rows);
+            return response.status(200).json(results.rows);
         })
     } catch (error) {
         console.error('Error saving user to the database:', error);
