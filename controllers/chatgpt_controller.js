@@ -11,7 +11,10 @@ const askSomething = async (request, response) => {
             messages: [{ role: "user", content: message + "Explain like a 5 year old" }],
         })
         .then((res) => {
-            return response.status(200).send(res.data.choices[0].message.content)
+            let object = {
+                message: res.data.choices[0].message.content
+            }
+            return response.status(200).send(object)
 
         })
         .catch((e) => {

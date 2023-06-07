@@ -82,6 +82,7 @@ const Signin = (request, response) => {
           email: email,
           username: results.rows[0].username,
           number: number,
+          userId: results.rows[0].user_id
         };
 
         response.status(200).send(successObject);
