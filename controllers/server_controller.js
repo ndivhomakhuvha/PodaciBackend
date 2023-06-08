@@ -135,7 +135,7 @@ const DeleteOne = async (request, response) => {
   }
   try {
     await client.query("DELETE FROM addresses WHERE server_id = $1", [
-      [server_id],
+      server_id,
     ]);
     return response
       .status(200)
