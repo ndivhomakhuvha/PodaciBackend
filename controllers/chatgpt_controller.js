@@ -14,7 +14,7 @@ const askSomething = async (request, response) => {
             let object = {
                 message: res.data.choices[0].message.content
             }
-            return response.status(200).send(object)
+            return response.status(200).json(object)
 
         })
         .catch((e) => {

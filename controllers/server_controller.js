@@ -17,6 +17,14 @@ async function checkUrl(url) {
   return status;
 }
 
+checkUrl(`http://52.67.97.86`)
+  .then((data) => {
+    console.log(data)
+  })
+  .catch((error) => {
+    console.log(error)
+  });
+
 async function ServerExists(ipadress) {
   try {
     const ServerQuery = {
@@ -46,7 +54,7 @@ const createServer = async (request, response) => {
   try {
     const exists = await ServerExists(ipadress);
     if (exists) {
-      response.status(409).send({ message: "Server already exists" });
+      response.status(409).json({ message: "Server already exists" });
       return;
     }
     await client.query(
@@ -58,7 +66,7 @@ const createServer = async (request, response) => {
         }
         response
           .status(201)
-          .send(`Server added with ID: ${results.rows[0].server_id}`);
+          .json(`Server added with ID: ${results.rows[0].server_id}`);
       }
     );
   } catch (error) {
@@ -94,7 +102,7 @@ const getAllServers = async (request, response) => {
         if (error) {
           throw error;
         }
-        return response.status(200).send(results.rows);
+        return response.status(200).json(results.rows);
       }
     );
   } catch (error) {
@@ -117,7 +125,7 @@ const updateServer = (request, response) => {
           if (error) {
             throw error;
           }
-          response.status(200).send(`User modified with ID: ${server_id}`);
+          return response.status(200).json({ message: `User modified with ID: ${server_id}` });
         }
       );
     })
@@ -131,7 +139,7 @@ const DeleteOne = async (request, response) => {
   if (isNaN(server_id)) {
     return response
       .status(400)
-      .send({ message: "Invalid server ID provided." });
+      .json({ message: "Invalid server ID provided." });
   }
   try {
     await client.query("DELETE FROM addresses WHERE server_id = $1", [
@@ -139,12 +147,12 @@ const DeleteOne = async (request, response) => {
     ]);
     return response
       .status(200)
-      .send({ message: `Server with ID ${server_id} has been deleted!` });
+      .json({ message: `Server with ID ${server_id} has been deleted!` });
   } catch (error) {
     console.error("Error deleting server from the database:", error);
     return response
       .status(500)
-      .send({ message: "Server deletion failed.", error: error.message });
+      .json({ message: "Server deletion failed.", error: error.message });
   }
 };
 

@@ -26,7 +26,7 @@ const createUser = async (request, response) => {
   try {
     const exists = await EmailExists(email);
     if (exists) {
-      return response.status(409).send({ message: "User already exists" });
+      return response.status(409).json({ message: "User already exists" });
     }
     await client.query(
       "INSERT INTO users (username, email,password) VALUES ($1, $2, $3) RETURNING *",
@@ -85,9 +85,9 @@ const Signin = (request, response) => {
           userId: results.rows[0].user_id
         };
 
-        response.status(200).send(successObject);
+        response.status(200).json(successObject);
       } else {
-        response.status(409).send({ message: "Failure response" });
+        response.status(409).json({ message: "Failure response" });
       }
     }
   );
@@ -100,7 +100,7 @@ const resendOTP = async (request, response) => {
   try {
     const exists = await EmailExists(email);
     if (!exists) {
-      return response.status(409).send({ message: "User does not exist" });
+      return response.status(409).json({ message: "User does not exist" });
     }
     let number = Math.floor(1000 + Math.random() * 9000);
     const mailConfigurations = {
@@ -123,7 +123,7 @@ const resendOTP = async (request, response) => {
       email: email,
       number: number,
     };
-    response.status(200).send(successObject);
+    response.status(200).json(successObject);
   } catch (error) {
     console.error("Error resending OTP", error);
     throw error;
