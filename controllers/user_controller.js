@@ -47,16 +47,19 @@ const createUser = async (request, response) => {
 
 
 
-const Signin = (request, response) => {
+const Signin = async (request, response) => {
   const email = request.body.email;
   const password = request.body.password;
 
-  client.query(
-    "SELECT * FROM users WHERE email = $1",
+  await client.query(
+    "SELECT * FROM users WHERE email = $1 ",
     [email],
     (error, results) => {
       if (error) {
         throw error;
+      }
+      if (results.rows.length === 0) {
+        return response.status(409).json({ message: "Failure response" });
       }
       const userPassword = results.rows[0].password;
       let isPasswordValid = bcrypt.compareSync(password, userPassword);
@@ -85,9 +88,9 @@ const Signin = (request, response) => {
           userId: results.rows[0].user_id
         };
 
-        response.status(200).json(successObject);
+        return response.status(200).json(successObject);
       } else {
-        response.status(409).json({ message: "Failure response" });
+        return response.status(409).json({ message: "Failure response" });
       }
     }
   );

@@ -54,7 +54,7 @@ const createServer = async (request, response) => {
   try {
     const exists = await ServerExists(ipadress);
     if (exists) {
-      response.status(409).json({ message: "Server already exists" });
+      return response.status(409).json({ message: "Server already exists" });
       return;
     }
     await client.query(
@@ -64,7 +64,7 @@ const createServer = async (request, response) => {
         if (error) {
           throw error;
         }
-        response
+        return response
           .status(201)
           .json(`Server added with ID: ${results.rows[0].server_id}`);
       }
