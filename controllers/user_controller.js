@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import client from "../config/database_configuration.js";
 import transporter from "../config/email_configuration.js";
+import jwt_secret from '../config/jwtSecret.js'
+import jwt from 'jsonwebtoken'
 import "dotenv/config.js";
+
 
 async function EmailExists(email) {
   try {
@@ -81,11 +84,15 @@ const Signin = async (request, response) => {
           if (error) throw Error(error);
           console.log(info);
         });
+        let token = jwt.sign({ id: results.rows[0].user_id }, jwt_secret.secret, {
+          expiresIn: 86400,
+        });
         let successObject = {
           email: email,
           username: results.rows[0].username,
           number: number,
-          userId: results.rows[0].user_id
+          userId: results.rows[0].user_id,
+          token: token
         };
 
         return response.status(200).json(successObject);
