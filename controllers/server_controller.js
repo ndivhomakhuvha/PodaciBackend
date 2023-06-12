@@ -1,7 +1,7 @@
 import axios from "axios";
 import client from "../config/database_configuration.js";
 import { response } from "express";
-import shortUrl from "node-url-shortener";
+
 
 
 
@@ -40,10 +40,6 @@ async function ServerExists(ipadress) {
 const createServer = async (request, response) => {
   let status;
   const { imageurl, ipadress, name, memory, type, user_id } = request.body;
-  shortUrl.short(imageurl, function (err, url) {
-    imageurl = url
-    console.log(imageurl)
-  });
 
 
   checkUrl(`http://${ipadress}`)
