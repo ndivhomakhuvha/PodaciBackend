@@ -17,13 +17,7 @@ async function checkUrl(url) {
   return status;
 }
 
-checkUrl(`http://52.67.97.86`)
-  .then((data) => {
-    console.log(data)
-  })
-  .catch((error) => {
-    console.log(error)
-  });
+
 
 async function ServerExists(ipadress) {
   try {
