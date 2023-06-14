@@ -13,7 +13,7 @@ const askSomething = async (request, response) => {
         .then((res) => {
             let object = {
                 message: res.data.choices[0].message.content
-            }
+            } 
             return response.status(200).json(object)
 
         })
