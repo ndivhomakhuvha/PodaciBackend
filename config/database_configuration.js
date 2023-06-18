@@ -1,8 +1,7 @@
 import "dotenv/config";
 import Pool from 'pg'
-import fs from 'fs'
 
-// Read the SSL certificate files
+
 
 
 const PoolConstructor = Pool.Pool;

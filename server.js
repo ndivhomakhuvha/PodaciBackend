@@ -11,7 +11,6 @@ import GPTRoutes from './routes/gpt_router.js'
 
 const app = express();
 const PORT = process.env.PORT;
-//CORS Options
 const corsOptions = {
   origin: "*",
 };
