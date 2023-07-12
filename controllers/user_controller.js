@@ -157,9 +157,12 @@ const updateUser = async (request, response) => {
         if (error) {
           throw error;
         }
-        return response
-          .status(200)
-          .send({ message: `User with ID: ${user_id} has been updated` });
+        let successObject = {
+          email: email,
+          username: username,
+          userId: user_id,
+        };
+        return response.status(200).json(successObject);
       }
     );
   } catch (error) {
