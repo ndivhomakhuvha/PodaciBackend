@@ -4,6 +4,7 @@ import transporter from "../config/email_configuration.js";
 import jwt_secret from "../config/jwtSecret.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config.js";
+import { request, response } from "express";
 
 async function EmailExists(email) {
   try {
@@ -139,17 +140,26 @@ const resendOTP = async (request, response) => {
 };
 
 const updateUser = async (request, response) => {
-  const user_id = parseInt(request.params.user_id);
+  const user_id = parseInt(request.params.id);
   const { username, email, password } = request.body;
+
+  const saltRounds = 10;
+  const salt = await bcrypt.genSaltSync(saltRounds);
+  const hashedPassword = await bcrypt.hashSync(password, salt);
+  if (isNaN(user_id)) {
+    return response.status(400).json({ message: "Invalid user ID" });
+  }
   try {
     await client.query(
       "UPDATE users SET username = $1, email = $2, password = $3 WHERE user_id = $4",
-      [username, email, password, user_id],
+      [username, email, hashedPassword, user_id],
       (error, results) => {
         if (error) {
           throw error;
         }
-        return response.status(200).json(results.rows[0]);
+        return response
+          .status(200)
+          .send({ message: `User with ID: ${user_id} has been updated` });
       }
     );
   } catch (error) {
@@ -158,5 +168,3 @@ const updateUser = async (request, response) => {
 };
 
 export default { createUser, Signin, resendOTP, updateUser };
-
-
