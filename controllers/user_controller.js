@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import client from "../config/database_configuration.js";
 import transporter from "../config/email_configuration.js";
 import jwt_secret from "../config/jwtSecret.js";
