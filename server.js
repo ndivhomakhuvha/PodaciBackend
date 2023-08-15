@@ -2,10 +2,10 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import "dotenv/config";
-import pool from "./config/database_configuration.js";
-import Userroutes from './routes/user_router.js'
-import Serverroutes from './routes/server_router.js'
-import GPTRoutes from './routes/gpt_router.js'
+import pool from "./config/database_configuration/database_configuration.js";
+import Userroutes from './routes/user_routes/user_router.js'
+import Serverroutes from './routes/server_routes/server_router.js'
+import GPTRoutes from './routes/gpt_routes/gpt_router.js'
 
 
 

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import client from "../config/database_configuration.js";
-import transporter from "../config/email_configuration.js";
-import jwt_secret from "../config/jwtSecret.js";
+import client from "../../config/database_configuration/database_configuration.js";
+import transporter from "../../config/email_configuration/email_configuration.js";
+import jwt_secret from "../../config/jwt_secret/jwtSecret.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config.js";
 import { request, response } from "express";

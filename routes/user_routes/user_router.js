@@ -1,4 +1,4 @@
-import database from "../controllers/user_controller.js";
+import database from "../../controllers/user_controller/user_controller.js";
 import express from "express";
 const router = express.Router();
 
