@@ -40,6 +40,10 @@
   status VARCHAR(100)
 ); 
 ```
+
+# The user Table
+
+
 # Viewing Only Content from a single user
 
 ```SQL SELECT * FROM addresses WHERE user_id = $1 ```
