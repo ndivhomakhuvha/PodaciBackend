@@ -5,6 +5,7 @@ const router = express.Router();
 router.post("/", database.createUser);
 router.post("/sign", database.Signin);
 router.post("/resend", database.resendOTP);
-router.put('/update/:id', database.updateUser);
+router.put("/update/:id", database.updateUser);
+router.post("/guest_sign", database.guestSignIn);
 
 export default router;

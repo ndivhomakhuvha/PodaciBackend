@@ -104,6 +104,48 @@ const Signin = async (request, response) => {
   );
 };
 
+
+const guestSignIn = async (request, response) => {
+  const email = request.body.email;
+  const password = request.body.password;
+
+  await client.query(
+    "SELECT * FROM users WHERE email = $1 ",
+    [email],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      if (results.rows.length === 0) {
+        return response.status(409).json({ message: "Failure response" });
+      }
+      const userPassword = results.rows[0].password;
+      let isPasswordValid = bcrypt.compareSync(password, userPassword);
+      
+      if (isPasswordValid) {
+    
+        let token = jwt.sign(
+          { id: results.rows[0].user_id },
+          jwt_secret.secret,
+          {
+            expiresIn: 86400,
+          }
+        );
+        let successObject = {
+          email: email,
+          username: results.rows[0].username,
+          userId: results.rows[0].user_id,
+          token: token,
+        };
+
+        return response.status(200).json(successObject);
+      } else {
+        return response.status(409).json({ message: "Failure response" });
+      }
+    }
+  );
+};
+
 const resendOTP = async (request, response) => {
   const { email } = request.body;
   try {
@@ -170,4 +212,4 @@ const updateUser = async (request, response) => {
   }
 };
 
-export default { createUser, Signin, resendOTP, updateUser };
+export default { createUser, Signin, resendOTP, updateUser , guestSignIn };
