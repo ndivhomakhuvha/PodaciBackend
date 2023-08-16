@@ -4,6 +4,7 @@ import {
   getAllServersService,
   updateServerByServerIdService,
   deleteAparticularServerByIdService,
+  createServerWithHttpsService
 } from "../../services/server_services/server_services.js";
 
 //A controller that calls the createServerService
@@ -61,10 +62,22 @@ export async function deleteAparticularServerByIdController(request, response) {
   }
 }
 
+
+export async function createServerWithHttpsController(request, response) {
+  try {
+    const result = await createServerWithHttpsService(request, response);
+    return result;
+  } catch (error) {
+    console.error("Error in createServerWithHttpsService:", error);
+    return response.status(500).json({ message: "Internal server error" });
+  }
+}
+
 export default {
   createServerController,
   viewServerByUserIdController,
   getAllServersController,
   updateServerController,
   deleteAparticularServerByIdController,
+  createServerWithHttpsController
 };

@@ -21,6 +21,7 @@ async function checkUrl(url) {
   return status;
 }
 
+
 // this function checks if the server address exists on the database, by its ip address
 async function ServerExists(ipadress) {
   try {
@@ -44,6 +45,48 @@ export async function createServerService(request, response) {
   // it starts by checking if the url is up/ down using this function
   //if the server is up it will give it the STATUS UP / STATUS DOWN based on that
   checkUrl(`http://${ipadress}`)
+    .then((data) => {
+      status = data;
+    })
+    .catch((error) => {
+      status = error;
+    });
+
+  try {
+    const exists = await ServerExists(ipadress);
+    if (exists) {
+      return response.status(409).json({ message: "Server already exists" });
+      return;
+    }
+    // Will wait for the api to post
+    await client.query(
+      "INSERT INTO addresses (imageurl, ipadress,name,memory,type,status, user_id) VALUES ($1, $2, $3, $4, $5, $6 , $7 ) RETURNING *",
+      [imageurl, ipadress, name, memory, type, status, user_id],
+      (error, results) => {
+        if (error) {
+          throw error;
+        }
+        // return a message saying its posted
+        return response
+          .status(201)
+          .json(`Server added with ID: ${results.rows[0].server_id}`);
+      }
+    );
+  } catch (error) {
+    console.error("Error saving Server to the database:", error);
+    throw error;
+  }
+}
+
+
+// This function will create a new server
+export async function createServerWithHttpsService(request, response) {
+  let status;
+  const { imageurl, ipadress, name, memory, type, user_id } = request.body;
+
+  // it starts by checking if the url is up/ down using this function
+  //if the server is up it will give it the STATUS UP / STATUS DOWN based on that
+  checkUrl(`https://${ipadress}`)
     .then((data) => {
       status = data;
     })
@@ -170,4 +213,5 @@ export default {
   getAllServersService,
   updateServerByServerIdService,
   deleteAparticularServerByIdService,
+  createServerWithHttpsService
 };
