@@ -1,11 +1,17 @@
-import database from "../../controllers/user_controller/user_controller.js";
+import {
+  createUserController,
+  signInUserController,
+  signInAsGuestController,
+  resendOtpController,
+  updateUserController,
+} from "../../controllers/user_controller/user_controller.js";
 import express from "express";
 const router = express.Router();
 
-router.post("/", database.createUser);
-router.post("/sign", database.Signin);
-router.post("/resend", database.resendOTP);
-router.put("/update/:id", database.updateUser);
-router.post("/guest_sign", database.guestSignIn);
+router.post("/", createUserController);
+router.post("/sign", signInUserController);
+router.post("/resend", resendOtpController);
+router.put("/update/:id", updateUserController);
+router.post("/guest_sign", signInAsGuestController);
 
 export default router;
