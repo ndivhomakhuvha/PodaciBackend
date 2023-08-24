@@ -6,6 +6,7 @@ import pool from "./config/database_configuration/database_configuration.js";
 import Userroutes from "./routes/user_routes/user_router.js";
 import Serverroutes from "./routes/server_routes/server_router.js";
 import GPTRoutes from "./routes/gpt_routes/gpt_router.js";
+import morgan from "morgan";
 
 const app = express();
 
@@ -14,6 +15,7 @@ const PORT = process.env.PORT;
 const corsOptions = {
   origin: "*",
 };
+app.use(morgan('tiny'))
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(
