@@ -1,11 +1,15 @@
 import axios from "axios";
 import client from "../../config/database_configuration/database_configuration.js";
 import { response } from "express";
+import * as ipInfo from 'ip-info-finder';
+
 //This is the business logic file
 
 //This function checks if the server status is up or down
 // It will return a string
 // it is a asynchronous function
+
+
 async function checkUrl(url) {
   let status;
   try {
@@ -21,6 +25,14 @@ async function checkUrl(url) {
   return status;
 }
 
+async function findIpService(request,response){
+  const {ip_address } = request.body;
+  ipInfo.getIPInfo(ip_address).then(data => {
+    return response.status(200).json(data);
+  }).catch(error => {
+    return response.status(404).json({message: "Ip Address not found"});
+  })
+}
 
 // this function checks if the server address exists on the database, by its ip address
 async function ServerExists(ipadress) {
