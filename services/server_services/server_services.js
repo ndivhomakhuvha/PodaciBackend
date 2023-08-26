@@ -1,7 +1,7 @@
 import axios from "axios";
 import client from "../../config/database_configuration/database_configuration.js";
 import { response } from "express";
-import * as ipInfo from 'ip-info-finder';
+
 
 //This is the business logic file
 
