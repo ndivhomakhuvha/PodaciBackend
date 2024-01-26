@@ -28,10 +28,11 @@ export async function sendEmailServerDown(email, serverNames) {
     const mailConfigurations = {
       from: process.env.NODEMAILER_USER,
       to: email,
-      subject: "Server is Down Notification",
+      subject: "Server Down Notification",
       html:
         "<h1>One of your Servers is Down 🌐</h1>" +
-        `<p>The server(s) which are affected are : ${serverNames}</p>`,
+        `<p>The server which is affected is : ${serverNames} 🖥</p>`
+        `<p>Made with ❤️ By ndivhom.</p>`,
     };
 
     // Send the mail upon everything above is correct
