@@ -3,12 +3,24 @@ import {
   signInUserService,
   signInAsGuestService,
   resendOtpService,
-  updateUserService
+  updateUserService,
+  verifyOTPService
 } from "../../services/user_services/user_service.js";
 
 export async function createUserController(request, response) {
   try {
     const result = await createUserService(request, response);
+    return result;
+  } catch (error) {
+    console.error("Error in createUserService:", error);
+    return response.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
+export async function verifyOTPController(request, response) {
+  try {
+    const result = await verifyOTPService(request, response);
     return result;
   } catch (error) {
     console.error("Error in createUserService:", error);
@@ -62,4 +74,5 @@ export default {
   resendOtpController,
   updateUserController,
   signInAsGuestController,
+  verifyOTPController
 };

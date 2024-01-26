@@ -10,7 +10,7 @@ export async function sendEmailLogin(email, number) {
       "<h1>Your Sign in OTP:</h1><br/>" +
       email +
       `<p>Your OTP is: <strong>${number}</strong><br/><br/>
-                         Made with ❤️ By FlexBox Inc.</p>`,
+                         Made with ❤️ By Ndivho Makhuvha(0607210343).</p>`,
   };
   // Send the mail upon everything above correct
   transporter.sendMail(mailConfigurations, function (error, info) {
@@ -32,7 +32,7 @@ export async function sendEmailServerDown(email, serverNames) {
       html:
         "<h1>One of your Servers is Down 🌐</h1>" +
         `<p>The server which is affected is : ${serverNames} 🖥</p>`
-        `<p>Made with ❤️ By ndivhom.</p>`,
+        `<p>Made with ❤️ By Ndivho Makhuvha(0607210343).</p>`,
     };
 
     // Send the mail upon everything above is correct

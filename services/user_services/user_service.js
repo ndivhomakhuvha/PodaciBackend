@@ -61,6 +61,37 @@ async function updateOTP(email, number) {
   }
 }
 
+export async function verifyOTPService(request, response) {
+  const user_id = parseInt(request.params.id);
+  const { otp } = request.body;
+
+  try {
+    const checkOtp = await client.query({
+      text: "SELECT * FROM users WHERE user_id = $1",
+      values: [user_id],
+    });
+
+    if (checkOtp.rows.length > 0) {
+      const storedOtp = checkOtp.rows[0].otp;
+
+      if (storedOtp === otp) {
+        let successObject = {
+          username: checkOtp.rows[0].username,
+          email:checkOtp.rows[0].email
+        }
+        return response.status(200).json(successObject);
+      } else {
+        return response.status(400).json({ text: "Wrong OTP" });
+      }
+    } else {
+      return response.status(404).json({ text: "User not found" });
+    }
+  } catch (error) {
+    console.error(`Error verifying OTP for user with ID ${user_id}:`, error);
+    return response.status(500).json({ text: "Internal Server Error" });
+  }
+}
+
 export async function signInUserService(request, response) {
   const email = request.body.email;
   const password = request.body.password;
@@ -89,9 +120,6 @@ export async function signInUserService(request, response) {
             }
           );
           let successObject = {
-            email: email,
-            username: results.rows[0].username,
-            number: number,
             userId: results.rows[0].user_id,
             token: token,
           };
@@ -222,4 +250,5 @@ export default {
   signInAsGuestService,
   resendOtpService,
   updateUserService,
+  verifyOTPService
 };
