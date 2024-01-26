@@ -35,11 +35,11 @@ async function findIpService(request,response){
 }
 
 // this function checks if the server address exists on the database, by its ip address
-async function ServerExists(ipadress) {
+async function ServerExists(ipadress, user_id) {
   try {
     const ServerQuery = {
-      text: "SELECT * FROM addresses WHERE ipadress = $1",
-      values: [ipadress],
+      text: "SELECT * FROM addresses WHERE ipadress = $1 AND user_id = $2",
+      values: [ipadress, user_id],
     };
     const ServerResult = await client.query(ServerQuery);
     return ServerResult && ServerResult.rows.length > 0;
@@ -65,7 +65,7 @@ export async function createServerService(request, response) {
     });
 
   try {
-    const exists = await ServerExists(ipadress);
+    const exists = await ServerExists(ipadress, user_id);
     if (exists) {
       return response.status(409).json({ message: "Server already exists" });
       return;

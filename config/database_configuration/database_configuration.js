@@ -11,7 +11,7 @@ const pool = new PoolConstructor({
   database: process.env.POSTGRES_DATABASE,
   password: process.env.POSTGRES_PASS,
   port: process.env.PORT_DB,
-  ssl: true,
+  ssl: false,
   synchronize: true,
   extra: {
     trustServerCertificate: true,
