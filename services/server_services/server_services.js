@@ -304,12 +304,13 @@ export async function pingAllServersScheduled(request, response) {
     const servers = await ScheduledgetAllServers();
 
     // Use Promise.all to wait for all checkUrl promises to complete
+    
     const updatePromises = servers.map(async (element) => {
       try {
         const url = `https://${element.ipadress}`;
 
         let status;
-        let downServers = []
+      
         try {
           // Use await directly instead of mixing with then/catch
           status = await checkUrl(url);
@@ -317,12 +318,13 @@ export async function pingAllServersScheduled(request, response) {
           console.error(`Error checking URL ${url}:`, error);
           status = error.message || "Error checking URL";
         }
+        let downServers = []
         if (status === "SERVER DOWN") {
           downServers.push(element);
         }
     
         for (const downServe of downServers) {
-          console.log(downServe)
+    
           const user = await getUserById(downServe.user_id);
           let listOfServers = downServe.name; // Assuming downServe is an object with a 'name' property
           await sendEmailServerDown(user.email, listOfServers);

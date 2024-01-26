@@ -48,6 +48,19 @@ export async function createUserService(request, response) {
   }
 }
 
+async function updateOTP(email, number) {
+  try {
+    const updateResult = await client.query({
+      text: "UPDATE users SET otp = $1 WHERE email = $2",
+      values: [number, email],
+    });
+    return updateResult;
+  } catch (error) {
+    console.error(`Error updating OTP for user with email ${email}:`, error);
+    throw error;
+  }
+}
+
 export async function signInUserService(request, response) {
   const email = request.body.email;
   const password = request.body.password;
@@ -67,6 +80,7 @@ export async function signInUserService(request, response) {
         let number = Math.floor(1000 + Math.random() * 9000);
         if (isPasswordValid) {
           await sendEmailLogin(email, number);
+          await updateOTP(email, number);
           let token = jwt.sign(
             { id: results.rows[0].user_id },
             jwt_secret.secret,
