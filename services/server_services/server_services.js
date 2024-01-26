@@ -43,7 +43,8 @@ async function ServerExists(ipadress, user_id) {
       values: [ipadress, user_id],
     };
     const ServerResult = await client.query(ServerQuery);
-    return ServerResult && ServerResult.rows.length > 0;
+    console.log(ServerResult && ServerResult.rows.length === 1)
+    return ServerResult && ServerResult.rows.length === 1;
   } catch (error) {
     console.error("Error checking user existence:", error);
     throw error;
@@ -108,9 +109,9 @@ export async function createServerWithHttpsService(request, response) {
 
   try {
     const exists = await ServerExists(ipadress);
-    if (exists) {
+    if (exists === true) {
       return response.status(409).json({ message: "Server already exists" });
-      return;
+   
     }
     // Will wait for the api to post
     await client.query(
