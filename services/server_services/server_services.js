@@ -108,7 +108,7 @@ export async function createServerWithHttpsService(request, response) {
     });
 
   try {
-    const exists = await ServerExists(ipadress);
+    const exists = await ServerExists(ipadress, user_id);
     if (exists === true) {
       return response.status(409).json({ message: "Server already exists" });
    
