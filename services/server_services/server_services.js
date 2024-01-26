@@ -2,13 +2,11 @@ import axios from "axios";
 import client from "../../config/database_configuration/database_configuration.js";
 import { response } from "express";
 
-
 //This is the business logic file
 
 //This function checks if the server status is up or down
 // It will return a string
 // it is a asynchronous function
-
 
 async function checkUrl(url) {
   let status;
@@ -25,13 +23,16 @@ async function checkUrl(url) {
   return status;
 }
 
-async function findIpService(request,response){
-  const {ip_address } = request.body;
-  ipInfo.getIPInfo(ip_address).then(data => {
-    return response.status(200).json(data);
-  }).catch(error => {
-    return response.status(404).json({message: "Ip Address not found"});
-  })
+async function findIpService(request, response) {
+  const { ip_address } = request.body;
+  ipInfo
+    .getIPInfo(ip_address)
+    .then((data) => {
+      return response.status(200).json(data);
+    })
+    .catch((error) => {
+      return response.status(404).json({ message: "Ip Address not found" });
+    });
 }
 
 // this function checks if the server address exists on the database, by its ip address
@@ -68,28 +69,27 @@ export async function createServerService(request, response) {
     const exists = await ServerExists(ipadress, user_id);
     if (exists) {
       return response.status(409).json({ message: "Server already exists" });
-      return;
-    }
-    // Will wait for the api to post
-    await client.query(
-      "INSERT INTO addresses (imageurl, ipadress,name,memory,type,status, user_id) VALUES ($1, $2, $3, $4, $5, $6 , $7 ) RETURNING *",
-      [imageurl, ipadress, name, memory, type, status, user_id],
-      (error, results) => {
-        if (error) {
-          throw error;
+    } else {
+      // Will wait for the api to post
+      await client.query(
+        "INSERT INTO addresses (imageurl, ipadress,name,memory,type,status, user_id) VALUES ($1, $2, $3, $4, $5, $6 , $7 ) RETURNING *",
+        [imageurl, ipadress, name, memory, type, status, user_id],
+        (error, results) => {
+          if (error) {
+            throw error;
+          }
+          // return a message saying its posted
+          return response
+            .status(201)
+            .json(`Server added with ID: ${results.rows[0].server_id}`);
         }
-        // return a message saying its posted
-        return response
-          .status(201)
-          .json(`Server added with ID: ${results.rows[0].server_id}`);
-      }
-    );
+      );
+    }
   } catch (error) {
     console.error("Error saving Server to the database:", error);
     throw error;
   }
 }
-
 
 // This function will create a new server
 export async function createServerWithHttpsService(request, response) {
@@ -225,5 +225,5 @@ export default {
   getAllServersService,
   updateServerByServerIdService,
   deleteAparticularServerByIdService,
-  createServerWithHttpsService
+  createServerWithHttpsService,
 };
