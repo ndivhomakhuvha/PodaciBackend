@@ -2,6 +2,10 @@ import axios from "axios";
 import client from "../../config/database_configuration/database_configuration.js";
 import { response } from "express";
 
+import { promisify } from "util";
+
+const queryAsync = promisify(client.query).bind(client);
+
 //This is the business logic file
 
 //This function checks if the server status is up or down
@@ -43,10 +47,35 @@ async function ServerExists(ipadress, user_id) {
       values: [ipadress, user_id],
     };
     const ServerResult = await client.query(ServerQuery);
-    console.log(ServerResult && ServerResult.rows.length === 1)
     return ServerResult && ServerResult.rows.length === 1;
   } catch (error) {
     console.error("Error checking user existence:", error);
+    throw error;
+  }
+}
+async function getAllServers(user_id) {
+  try {
+    const results = await queryAsync(
+      "SELECT * FROM addresses WHERE user_id = $1 ORDER BY server_id ASC",
+      [user_id]
+    );
+
+    return results.rows;
+  } catch (error) {
+    console.error("Error fetching servers from the database:", error);
+    throw error;
+  }
+}
+
+async function ScheduledgetAllServers() {
+  try {
+    const results = await queryAsync(
+      "SELECT * FROM addresses  ORDER BY server_id ASC"
+    );
+
+    return results.rows;
+  } catch (error) {
+    console.error("Error fetching servers from the database:", error);
     throw error;
   }
 }
@@ -111,7 +140,6 @@ export async function createServerWithHttpsService(request, response) {
     const exists = await ServerExists(ipadress, user_id);
     if (exists === true) {
       return response.status(409).json({ message: "Server already exists" });
-   
     }
     // Will wait for the api to post
     await client.query(
@@ -220,6 +248,106 @@ export async function deleteAparticularServerByIdService(request, response) {
   }
 }
 
+export async function pingAllServers(request, response) {
+  try {
+    const user_id = parseInt(request.params.id);
+    const servers = await getAllServers(user_id);
+
+    // Use Promise.all to wait for all checkUrl promises to complete
+    const updatePromises = servers.map(async (element) => {
+      try {
+        const url = `https://${element.ipadress}`;
+
+        let status;
+        try {
+          // Use await directly instead of mixing with then/catch
+          status = await checkUrl(url);
+        } catch (error) {
+          console.error(`Error checking URL ${url}:`, error);
+          status = error.message || "Error checking URL";
+        }
+
+        await updateServer(element.server_id, element.ipadress, status);
+      } catch (error) {
+        console.error(
+          `Error updating server with ID ${element.server_id}:`,
+          error
+        );
+        // Handle the error or log it as needed
+      }
+    });
+
+    await Promise.all(updatePromises);
+
+    return response
+      .status(200)
+      .json({ message: "All servers updated successfully" });
+  } catch (error) {
+    console.error("Error updating servers:", error);
+    return response.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+
+export async function pingAllServersScheduled(request, response) {
+  try {
+
+    const servers = await ScheduledgetAllServers();
+
+    // Use Promise.all to wait for all checkUrl promises to complete
+    const updatePromises = servers.map(async (element) => {
+      try {
+        const url = `https://${element.ipadress}`;
+
+        let status;
+        try {
+          // Use await directly instead of mixing with then/catch
+          status = await checkUrl(url);
+        } catch (error) {
+          console.error(`Error checking URL ${url}:`, error);
+          status = error.message || "Error checking URL";
+        }
+
+        await updateServer(element.server_id, element.ipadress, status);
+      } catch (error) {
+        console.error(
+          `Error updating server with ID ${element.server_id}:`,
+          error
+        );
+        // Handle the error or log it as needed
+      }
+    });
+
+    await Promise.all(updatePromises);
+
+    return response
+      .status(200)
+      .json({ message: "All servers updated successfully" });
+  } catch (error) {
+    console.error("Error updating servers:", error);
+    return response.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+
+
+async function updateServer(server_id, ipAddress, status) {
+  return new Promise((resolve, reject) => {
+    client.query(
+      "UPDATE addresses SET ipadress = $1, status = $2 WHERE server_id = $3",
+      [ipAddress, status, server_id],
+      (error, results) => {
+        if (error) {
+          console.error(`Error updating server with ID ${server_id}:`, error);
+          reject(error);
+        } else {
+          resolve();
+        }
+      }
+    );
+  });
+}
+
 export default {
   createServerService,
   viewServerByUserIdService,
@@ -227,4 +355,5 @@ export default {
   updateServerByServerIdService,
   deleteAparticularServerByIdService,
   createServerWithHttpsService,
+  pingAllServersScheduled
 };

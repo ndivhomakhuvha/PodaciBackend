@@ -4,7 +4,9 @@ import {
   getAllServersService,
   updateServerByServerIdService,
   deleteAparticularServerByIdService,
-  createServerWithHttpsService
+  createServerWithHttpsService,
+  pingAllServers,
+  pingAllServersScheduled
 } from "../../services/server_services/server_services.js";
 
 //A controller that calls the createServerService
@@ -28,6 +30,31 @@ export async function viewServerByUserIdController(request, response) {
     return response.status(500).json({ message: "Internal server error" });
   }
 }
+
+
+
+export async function pingAllServersController(request, response) {
+  try {
+    const result = await pingAllServers(request, response);
+    return result;
+  } catch (error) {
+    console.error("Error in pingAllServers:", error);
+    return response.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
+
+export async function pingAllServersControllerScheduled(request, response) {
+  try {
+    const result = await pingAllServersScheduled(request, response);
+    return result;
+  } catch (error) {
+    console.error("Error in pingAllServers:", error);
+    return response.status(500).json({ message: "Internal server error" });
+  }
+}
+
 
 //This function gets all the servers , regardless of the user.
 export async function getAllServersController(request, response) {
@@ -79,5 +106,6 @@ export default {
   getAllServersController,
   updateServerController,
   deleteAparticularServerByIdController,
-  createServerWithHttpsController
+  createServerWithHttpsController,
+  pingAllServersControllerScheduled
 };
