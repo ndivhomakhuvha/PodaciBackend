@@ -5,6 +5,7 @@ import { response } from "express";
 import { promisify } from "util";
 
 const queryAsync = promisify(client.query).bind(client);
+import { sendEmailServerDown } from "../../utils/email.js";
 
 //This is the business logic file
 
@@ -287,7 +288,15 @@ export async function pingAllServers(request, response) {
     return response.status(500).json({ error: "Internal Server Error" });
   }
 }
-
+async function getUserById(user_id) {
+  try {
+    const result = await queryAsync("SELECT * FROM users WHERE user_id = $1", [user_id]);
+    return result.rows[0]; // Assuming you expect only one user or null
+  } catch (error) {
+    console.error(`Error fetching user with ID ${user_id}:`, error);
+    throw error;
+  }
+}
 
 export async function pingAllServersScheduled(request, response) {
   try {
@@ -300,6 +309,7 @@ export async function pingAllServersScheduled(request, response) {
         const url = `https://${element.ipadress}`;
 
         let status;
+        let downServers = []
         try {
           // Use await directly instead of mixing with then/catch
           status = await checkUrl(url);
@@ -307,7 +317,16 @@ export async function pingAllServersScheduled(request, response) {
           console.error(`Error checking URL ${url}:`, error);
           status = error.message || "Error checking URL";
         }
-
+        if (status === "SERVER DOWN") {
+          downServers.push(element);
+        }
+    
+        for (const downServe of downServers) {
+          console.log(downServe)
+          const user = await getUserById(downServe.user_id);
+          let listOfServers = downServe.name; // Assuming downServe is an object with a 'name' property
+          await sendEmailServerDown(user.email, listOfServers);
+        }
         await updateServer(element.server_id, element.ipadress, status);
       } catch (error) {
         console.error(

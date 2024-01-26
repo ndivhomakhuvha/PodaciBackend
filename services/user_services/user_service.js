@@ -5,6 +5,7 @@ import jwt_secret from "../../config/jwt_secret/jwtSecret.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config.js";
 import { request, response } from "express";
+import { sendEmailLogin } from "../../utils/email.js";
 
 async function EmailExists(email) {
   try {
@@ -54,7 +55,7 @@ export async function signInUserService(request, response) {
     await client.query(
       "SELECT * FROM users WHERE email = $1 ",
       [email],
-      (error, results) => {
+      async (error, results) => {
         if (error) {
           throw error;
         }
@@ -65,22 +66,7 @@ export async function signInUserService(request, response) {
         let isPasswordValid = bcrypt.compareSync(password, userPassword);
         let number = Math.floor(1000 + Math.random() * 9000);
         if (isPasswordValid) {
-          const mailConfigurations = {
-            from: process.env.NODEMAILER_USER,
-            to: email,
-            subject: "Sign in OTP",
-            // This would be the text of email body
-            html:
-              "<h1>Your Sign in OTP:</h1><br/>" +
-              email +
-              `<p>Your OTP is: <strong>${number}</strong><br/><br/>
-                             Made with ❤️ By FlexBox Inc.</p>`,
-          };
-          // Send the mail upon everything above correct
-          transporter.sendMail(mailConfigurations, function (error, info) {
-            if (error) throw Error(error);
-            console.log(info);
-          });
+          await sendEmailLogin(email, number);
           let token = jwt.sign(
             { id: results.rows[0].user_id },
             jwt_secret.secret,
@@ -221,5 +207,5 @@ export default {
   signInUserService,
   signInAsGuestService,
   resendOtpService,
-  updateUserService
+  updateUserService,
 };
