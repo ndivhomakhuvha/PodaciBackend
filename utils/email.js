@@ -37,7 +37,8 @@ export async function sendEmailServerDown(email, serverNames) {
 
     // Send the mail upon everything above is correct
     const info = await transporter.sendMail(mailConfigurations);
-    console.log(info);
+    return info;
+  
   } catch (error) {
     console.error("Error sending email:", error.message);
     // You can handle the error or rethrow it as needed

@@ -324,12 +324,12 @@ export async function pingAllServersScheduled(request, response) {
         }
     
         for (const downServe of downServers) {
-          console.log(downServe)
+
           const user = await getUserById(downServe.user_id);
           let listOfServers = downServe.name; // Assuming downServe is an object with a 'name' property
           await sendEmailServerDown(user.email, listOfServers);
         }
-        console.log(element)
+    
         await updateServer(element.server_id, element.ipadress, status);
       } catch (error) {
         console.error(
