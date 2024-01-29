@@ -31,7 +31,7 @@ export async function sendEmailServerDown(email, serverNames) {
       subject: "Server Down Notification",
       html:
         "<h1>One of your Servers is Down 🌐</h1>" +
-        `<p>The server which is affected is : ${serverNames} 🖥</p>`
+        `<p>The server which is affected is : ${serverNames} 🖥</p>` +
         `<p>Made with ❤️ By Ndivho Makhuvha(0607210343).</p>`,
     };
 
