@@ -45,7 +45,7 @@ app.use("/api/server", Serverroutes);
 app.use("/api/gpt", GPTRoutes);
 
 cron.schedule(
-  "* 6 * * *",
+  "0 6 * * *",
   async () => {
     try {
       console.log("Running scheduled task...");
