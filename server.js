@@ -67,3 +67,28 @@ cron.schedule(
     timezone: "Africa/Johannesburg",
   }
 );
+
+
+cron.schedule(
+  "*/5 * * * *",
+  async () => {
+    try {
+    
+
+      // Make an HTTP request to your specific endpoint
+      const response = await axios.get(
+        "https://podaci.onrender.com"
+      );
+
+      // Log the response or perform any other necessary actions
+      console.log("Response:", response.data);
+
+      
+    } catch (error) {
+      console.error("Error in scheduled task:", error.message);
+    }
+  },
+  {
+    timezone: "Africa/Johannesburg",
+  }
+);
