@@ -70,7 +70,7 @@ cron.schedule(
 
 
 cron.schedule(
-  "*/15 * * * *",
+  "*/10 * * * *",
   async () => {
     try {
     
