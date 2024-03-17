@@ -6,6 +6,10 @@ import { promisify } from "util";
 
 const queryAsync = promisify(client.query).bind(client);
 import { sendEmailServerDown } from "../../utils/email.js";
+import fs from "fs";
+import Docxtemplater from "docxtemplater";
+import JSZip from "jszip";
+import { exec } from "child_process";
 
 //This is the business logic file
 
@@ -290,7 +294,9 @@ export async function pingAllServers(request, response) {
 }
 async function getUserById(user_id) {
   try {
-    const result = await queryAsync("SELECT * FROM users WHERE user_id = $1", [user_id]);
+    const result = await queryAsync("SELECT * FROM users WHERE user_id = $1", [
+      user_id,
+    ]);
     return result.rows[0]; // Assuming you expect only one user or null
   } catch (error) {
     console.error(`Error fetching user with ID ${user_id}:`, error);
@@ -300,48 +306,49 @@ async function getUserById(user_id) {
 
 export async function pingAllServersScheduled(request, response) {
   try {
-
     const servers = await ScheduledgetAllServers();
+    const usersServersMap = new Map(); // Map to store servers for each user
 
-    // Use Promise.all to wait for all checkUrl promises to complete
-    
-    const updatePromises = servers.map(async (element) => {
+    // Iterate through servers to check status and collect servers for each user
+    for (const element of servers) {
+      const url = `https://${element.ipadress}`;
+
+      let status;
+
       try {
-        const url = `https://${element.ipadress}`;
-
-        let status;
-      
-        try {
-          // Use await directly instead of mixing with then/catch
-          status = await checkUrl(url);
-        } catch (error) {
-          console.error(`Error checking URL ${url}:`, error);
-          status = error.message || "Error checking URL";
-        }
-        let downServers = []
-        if (status === "SERVER DOWN") {
-          downServers.push(element);
-        }
-    
-        for (const downServe of downServers) {
-
-          const user = await getUserById(downServe.user_id);
-          let listOfServers = downServe.name; // Assuming downServe is an object with a 'name' property
-          await sendEmailServerDown(user.email, listOfServers);
-        }
-    
+        status = await checkUrl(url);
         await updateServer(element.server_id, element.ipadress, status);
       } catch (error) {
-        console.error(
-          `Error updating server with ID ${element.server_id}:`,
-          error
-        );
+        console.error(`Error checking URL ${url}:`, error);
+        status = error.message || "Error checking URL";
+      }
+
+      // Update server status in the database
+
+      // Store server information for each user
+      if (!usersServersMap.has(element.user_id)) {
+        usersServersMap.set(element.user_id, []);
+      }
+      usersServersMap.get(element.user_id).push({
+        server_id: element.server_id,
+        ip: element.ipadress,
+        status: status,
+        name: element.name,
+      });
+    }
+
+    // Send email for each user with servers' status
+    for (const [userId, servers] of usersServersMap) {
+      try {
+        const user = await getUserById(userId);
+        const docxPath = await generateDocument(user.email, servers); // Pass servers array to generateDocument function
+        const pdfPath = await convertToPdf(docxPath);
+        await sendEmailServerDown(user.email, pdfPath);
+      } catch (error) {
+        console.error(`Error sending email to user ${userId}:`, error);
         // Handle the error or log it as needed
       }
-    });
-
-    await Promise.all(updatePromises);
-
+    }
     return response
       .status(200)
       .json({ message: "All servers updated successfully" });
@@ -350,8 +357,6 @@ export async function pingAllServersScheduled(request, response) {
     return response.status(500).json({ error: "Internal Server Error" });
   }
 }
-
-
 
 async function updateServer(server_id, ipAddress, status) {
   return new Promise((resolve, reject) => {
@@ -370,6 +375,63 @@ async function updateServer(server_id, ipAddress, status) {
   });
 }
 
+const generateDocument = async (user_email, data) => {
+  const template = fs.readFileSync("templates/template.docx", "binary");
+  const doc = new Docxtemplater();
+  doc.loadZip(new JSZip(template));
+
+  console.log(data);
+
+  const downServers = data.filter((server) => server.status === "SERVER DOWN");
+  const upServers = data.filter((server) => server.status === "SERVER UP");
+
+  // Set the data for the template
+  doc.setData({
+    user_name: user_email, // Replace with the user's name
+    down_servers: downServers,
+    up_servers: upServers,
+  });
+
+  // Render the document
+  try {
+    doc.render();
+  } catch (error) {
+    console.error("Error rendering document:", error);
+    throw error;
+  }
+  // Write the generated document to a temporary file
+  const outputPath = "outputs/output.docx";
+  fs.writeFileSync(
+    outputPath,
+    Buffer.from(doc.getZip().generate({ type: "nodebuffer" }))
+  );
+  return outputPath;
+};
+
+const convertToPdf = async (docxPath) => {
+  try {
+    const pdfPath = "outputs/output.pdf";
+    await new Promise((resolve, reject) => {
+      exec(
+        `pandoc "${docxPath}" -o "${pdfPath}" --pdf-engine=wkhtmltopdf`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error("Error converting to PDF:", error);
+            reject(error);
+          } else {
+            console.log("Converted to PDF successfully:", pdfPath);
+            resolve(pdfPath);
+          }
+        }
+      );
+    });
+    return pdfPath;
+  } catch (error) {
+    console.error("Error converting to PDF:", error);
+    throw error;
+  }
+};
+
 export default {
   createServerService,
   viewServerByUserIdService,
@@ -377,5 +439,5 @@ export default {
   updateServerByServerIdService,
   deleteAparticularServerByIdService,
   createServerWithHttpsService,
-  pingAllServersScheduled
+  pingAllServersScheduled,
 };

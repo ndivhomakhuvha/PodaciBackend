@@ -19,26 +19,20 @@ export async function sendEmailLogin(email, number) {
   });
 }
 
-export async function sendEmailServerDown(email, serverNames) {
+export async function sendEmailServerDown(email, pdfPath) {
   try {
     if (!email) {
       throw new Error("No recipients defined. Email address is required.");
     }
 
-    const mailConfigurations = {
-      from: process.env.NODEMAILER_USER,
+    const message = {
+      from: "ndibo69@gmail.com",
       to: email,
-      subject: "Server Down Notification",
-      html:
-        "<h1>One of your Servers is Down 🌐</h1>" +
-        `<p>The server which is affected is : ${serverNames} 🖥</p>` +
-        `<p>Made with ❤️ By Ndivho Makhuvha(0607210343).</p>`,
+      subject: "Server Document Updates",
+      text: "Please find the attached document about your servers.",
+      attachments: [{ filename: `${email}.pdf`, path: pdfPath }],
     };
-
-    // Send the mail upon everything above is correct
-    const info = await transporter.sendMail(mailConfigurations);
-    return info;
-  
+    await transporter.sendMail(message);
   } catch (error) {
     console.error("Error sending email:", error.message);
     // You can handle the error or rethrow it as needed
